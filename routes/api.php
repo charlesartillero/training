@@ -18,9 +18,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix($version)->group(function () {
         Route::apiResource('tickets', TicketController::class);
+        Route::apiResource('users', UserController::class);
     });
 
-    Route::apiResource('users', UserController::class);
+
 });
 
 
