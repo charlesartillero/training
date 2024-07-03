@@ -20,14 +20,14 @@ class UserResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'email' => $this->email,
-                $this->mergeWhen($request->routeIs('users.*'), [
+                $this->mergeWhen($request->routeIs('authors.*'), [
                     'emailVerifiedAt' => $this->email_verified_at,
                     'updatedAt' => $this->updated_at,
                     'createdAt' => $this->created_at
                 ]),
             ],
             'includes' => TicketResource::collection($this->whenLoaded('tickets')),
-            'links' => route('users.show', ['user' => $this->id])
+            'links' => route('authors.show', ['author' => $this->id])
         ];
     }
 }

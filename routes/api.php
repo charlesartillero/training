@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuthorTicketsController;
 use App\Http\Controllers\Api\V1\TicketController;
-use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\AuthorController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +19,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix($version)->group(function () {
         Route::apiResource('tickets', TicketController::class);
-        Route::apiResource('users', UserController::class);
+        Route::apiResource('authors', AuthorController::class);
+        Route::apiResource('authors.tickets', AuthorTicketsController::class);
+
     });
 
 
