@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\StoreTicketRequest;
 use App\Http\Requests\Api\V1\UpdateTicketRequest;
 use App\Http\Resources\V1\TicketResource;
 use App\Models\Ticket;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TicketController extends ApiController
 {
@@ -40,13 +41,16 @@ class TicketController extends ApiController
     /**
      * Display the specified resource.
      */
-    public function show(Ticket $ticket)
+    public function show(string $ticket)
     {
-        if ($this->include('author')) {
-            return new TicketResource($ticket->load(['user']));
+        try {
+            $ticket = Ticket::findorFail($ticket);
+            return new TicketResource($ticket);
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error("Ticket not found.",404);
         }
 
-        return new TicketResource($ticket);
     }
 
 
@@ -55,14 +59,28 @@ class TicketController extends ApiController
      */
     public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        //
+        $ticket->update($request->validated("data.attributes"));
+
+        return new TicketResource($ticket);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ticket $ticket)
+    public function destroy(string $ticket)
     {
-        //
+        try {
+
+            $ticket = Ticket::findorFail($ticket);
+            $ticket->delete();
+
+            return $this->ok("Ticket deleted successfully.");
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error("Ticket not found.",404);
+        }
+
+
+
     }
 }

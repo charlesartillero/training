@@ -45,4 +45,24 @@ class AuthorTicketsController extends ApiController
 
         return new TicketResource(Ticket::create($model));
     }
+
+    public function destroy($author_id, string $ticket)
+    {
+        try {
+            $ticket = Ticket::findorFail($ticket);
+
+            if ($ticket->user_id != $author_id) {
+                return $this->error("This ticket does not belong to you.", 403);
+            }
+
+            $ticket->delete();
+
+            return $this->ok("Ticket deleted successfully.");
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error("Ticket not found.",404);
+        }
+
+
+    }
 }

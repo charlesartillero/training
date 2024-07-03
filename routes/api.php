@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\V1\AuthorController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use PHPUnit\Framework\Attributes\Ticket;
+
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
