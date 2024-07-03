@@ -26,7 +26,15 @@ class TicketController extends ApiController
      */
     public function store(StoreTicketRequest $request)
     {
-        //
+
+        $model = [
+            "title" => $request->validated("data.attributes.title"),
+            "description" => $request->validated("data.attributes.description"),
+            "status" => $request->validated("data.attributes.status"),
+            "user_id" => $request->validated("data.relationships.author.data.id"),
+        ];
+
+        return new TicketResource(Ticket::create($model));
     }
 
     /**
