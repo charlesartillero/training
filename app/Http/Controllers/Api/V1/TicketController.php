@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\UpdateTicketRequest;
 use App\Http\Resources\V1\TicketResource;
 use App\Models\Ticket;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class TicketController extends ApiController
 {
@@ -44,7 +45,7 @@ class TicketController extends ApiController
     public function show(string $ticket)
     {
         try {
-            $ticket = Ticket::findorFail($ticket);
+            $ticket = Ticket::with('author')->findorFail($ticket);
             return new TicketResource($ticket);
 
         } catch (ModelNotFoundException $e) {
@@ -57,21 +58,39 @@ class TicketController extends ApiController
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
+    public function update(UpdateTicketRequest $request, string $ticket)
     {
-        $ticket->update($request->validated("data.attributes"));
+        try {
+            $ticket = Ticket::findorFail($ticket);
 
-        return new TicketResource($ticket);
+            if ($request->user()->cannot('update', $ticket)) {
+                return $this->error("You don't have permission to update this ticket.",403);
+            }
+
+            $ticket->update($request->validated("data.attributes"));
+
+            return new TicketResource($ticket);
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error("Ticket not found.",404);
+        }
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $ticket)
+    public function destroy(Request $request, string $ticket)
     {
-        try {
 
+        try {
             $ticket = Ticket::findorFail($ticket);
+
+            if ($request->user()->cannot('delete', $ticket)) {
+                return $this->error("You don't have permission to delete this ticket.",403);
+            }
+
             $ticket->delete();
 
             return $this->ok("Ticket deleted successfully.");
