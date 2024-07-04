@@ -27,7 +27,7 @@ class StoreTicketRequest extends FormRequest
             'data.attributes.status' => 'required|string|in:A,C,H,X',
         ];
 
-        if ($this->routeIs('tickets.store')) {
+        if ($this->routeIs('tickets.store') && $this->user()->is_manager ){
             $rules['data.relationships.author.data.id'] = 'required|integer|exists:users,id';
         }
 
