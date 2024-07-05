@@ -63,6 +63,5 @@ class AuthorTicketsController extends ApiController
             return $this->error("Ticket not found.",404);
         }
 
-
     }
 }

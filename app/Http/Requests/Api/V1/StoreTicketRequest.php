@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreTicketRequest extends FormRequest
 {
@@ -27,7 +28,7 @@ class StoreTicketRequest extends FormRequest
             'data.attributes.status' => 'required|string|in:A,C,H,X',
         ];
 
-        if ($this->routeIs('tickets.store') && $this->user()->is_manager ){
+        if ($this->routeIs('tickets.store') && Auth::user()->is_manager ){
             $rules['data.relationships.author.data.id'] = 'required|integer|exists:users,id';
         }
 

@@ -13,7 +13,12 @@ use Illuminate\Http\Request;
 class TicketController extends ApiController
 {
     /**
-     * Display a listing of the resource.
+     * Get all tickets
+     *
+     * @group Managing Tickets
+     * @queryParam sort string Data field(s) to sort by.
+     * Seperate multiple fields with commas, Denote descending sort with a minus sign.
+     * Example: title, -createdAt
      */
     public function index(TicketFilter $filters)
     {
