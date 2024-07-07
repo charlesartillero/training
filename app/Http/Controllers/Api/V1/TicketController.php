@@ -7,11 +7,19 @@ use App\Http\Requests\Api\V1\StoreTicketRequest;
 use App\Http\Requests\Api\V1\UpdateTicketRequest;
 use App\Http\Resources\V1\TicketResource;
 use App\Models\Ticket;
+use App\Services\TicketService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class TicketController extends ApiController
 {
+    protected $ticketService;
+
+    function __construct(TicketService $service)
+    {
+        $this->ticketService = $service;
+    }
+
     /**
      * Get all tickets
      *
@@ -22,9 +30,9 @@ class TicketController extends ApiController
      */
     public function index(TicketFilter $filters)
     {
-        $tickets = Ticket::filter($filters);
+        $tickets = $this->ticketService->getAllTicketsPaginate($filters);
 
-        return TicketResource::collection($tickets->paginate());
+        return TicketResource::collection($tickets);
     }
 
 
@@ -33,20 +41,9 @@ class TicketController extends ApiController
      */
     public function store(StoreTicketRequest $request)
     {
+        $ticket = $this->ticketService->createNewTicket($request);
 
-        $user_id = $request->user()->is_manager
-            ? $request->validated("data.relationships.author.data.id")
-            : $request->user()->id;
-
-
-        $model = [
-            "title" => $request->validated("data.attributes.title"),
-            "description" => $request->validated("data.attributes.description"),
-            "status" => $request->validated("data.attributes.status"),
-            "user_id" => $user_id,
-        ];
-
-        return new TicketResource(Ticket::create($model));
+        return new TicketResource($ticket);
     }
 
     /**
@@ -54,13 +51,13 @@ class TicketController extends ApiController
      */
     public function show(string $ticket)
     {
-        try {
-            $ticket = Ticket::with('author')->findorFail($ticket);
-            return new TicketResource($ticket);
+        $ticket = $this->ticketService->findTicketById($ticket);
 
-        } catch (ModelNotFoundException $e) {
-            return $this->error("Ticket not found.",404);
+        if ($ticket === null) {
+            return $this->error("Ticket not found", 404);
         }
+
+        return new TicketResource($ticket);
 
     }
 
@@ -70,22 +67,25 @@ class TicketController extends ApiController
      */
     public function update(UpdateTicketRequest $request, string $ticket)
     {
+        $ticket = $this->ticketService->findTicketById($ticket);
 
-        try {
-            $ticket = Ticket::findorFail($ticket);
-
-            if ($request->user()->cannot('update', $ticket)) {
-                return $this->error("You don't have permission to update this ticket.",403);
-            }
-
-            $ticket->update($request->validated("data.attributes"));
-
-            return new TicketResource($ticket);
-
-        } catch (ModelNotFoundException $e) {
-            return $this->error("Ticket not found.",404);
+        if ($ticket === null) {
+            return $this->error("Ticket not found", 404);
         }
 
+
+        if (! $this->ticketService->authorizedTo('update', $ticket)) {
+            return $this->error("You do not have permission to update ticket", 403);
+        }
+
+        $updateTicket = $this->ticketService->updateTicket($ticket, $request->validated('data.attributes'));
+
+
+        if (! $updateTicket) {
+            return $this->error("Failed to update ticket", 500);
+        }
+
+        return $this->success("Ticket updated successfully");
 
     }
 
@@ -95,21 +95,19 @@ class TicketController extends ApiController
     public function destroy(Request $request, string $ticket)
     {
 
-        try {
-            $ticket = Ticket::findorFail($ticket);
+        $ticket = $this->ticketService->findTicketById($ticket);
 
-            if ($request->user()->cannot('delete', $ticket)) {
-                return $this->error("You don't have permission to delete this ticket.",403);
-            }
-
-            $ticket->delete();
-
-            return $this->ok("Ticket deleted successfully.");
-
-        } catch (ModelNotFoundException $e) {
-            return $this->error("Ticket not found.",404);
+        if ($ticket === null) {
+            return $this->error("Ticket not found", 404);
         }
 
+        if (! $this->ticketService->authorizedTo('delete', $ticket)) {
+            return $this->error("You do not have permission to delete this ticket", 403);
+        }
+
+        $this->ticketService->deleteTicket($ticket);
+
+        return $this->success("Ticket deleted successfully");
 
 
     }

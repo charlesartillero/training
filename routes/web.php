@@ -1,12 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+
+Route::get('/test', function () {
+    return "Sign URL";
+})->name('test')->middleware('signed');
 
 Route::get('/', function () {
 
-    $user = \App\Models\User::first();
+    $signedUrl = URL::signedRoute('test', [],  now()->addSeconds(1));
+    echo "<a href='{$signedUrl}'>Signed URL</a>";
 
-    \App\Jobs\SampleJob::dispatch($user);
-
-    return 'Done';
 });
+
+Route::get('/md5', function () {
+    return md5(time());
+});
+
+
+
+
