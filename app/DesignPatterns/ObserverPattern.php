@@ -49,7 +49,6 @@ class Register implements Subject {
     }
 
     public function fire() {
-
         // Register a user
         $this->notify();
     }

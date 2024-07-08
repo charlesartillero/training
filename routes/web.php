@@ -1,5 +1,6 @@
 <?php
 
+use App\DesignPatterns\SpecificationPattern\Item;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -16,6 +17,14 @@ Route::get('/', function () {
 
 Route::get('/md5', function () {
     return md5(time());
+});
+
+Route::get('/item', function () {
+
+    $item = new Item(2.1);
+
+    dd($item);
+
 });
 
 
