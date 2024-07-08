@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Ticket;
-use App\Repositories\TicketRepository;
+
 
 class TicketService
 {
     protected $ticketRepository;
 
-    function __construct(TicketRepository $ticketRepository)
+    function __construct(TicketRepositoryInterface $ticketRepository)
     {
         $this->ticketRepository = $ticketRepository;
     }
