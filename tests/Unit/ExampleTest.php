@@ -7,7 +7,6 @@ use App\DesignPatterns\ChainPattern\Locks;
 use App\DesignPatterns\SpecificationPattern\Item;
 use App\DesignPatterns\SpecificationPattern\Specifications\AndSpecification;
 use App\DesignPatterns\SpecificationPattern\Specifications\CategorySpecification;
-use App\DesignPatterns\SpecificationPattern\Specifications\OrSpecification;
 use App\DesignPatterns\SpecificationPattern\Specifications\PriceSpecification;
 
 

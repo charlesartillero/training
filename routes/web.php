@@ -4,13 +4,13 @@ use App\DesignPatterns\SpecificationPattern\Item;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
-Route::get('/test', function () {
+Route::get('/Test', function () {
     return "Sign URL";
-})->name('test')->middleware('signed');
+})->name('Test')->middleware('signed');
 
 Route::get('/', function () {
 
-    $signedUrl = URL::signedRoute('test', [],  now()->addSeconds(1));
+    $signedUrl = URL::signedRoute('Test', [],  now()->addSeconds(1));
     echo "<a href='{$signedUrl}'>Signed URL</a>";
 
 });
