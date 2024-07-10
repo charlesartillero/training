@@ -15,13 +15,15 @@ class Question
         $this->solution = $solution;
     }
 
-    public function answer($answer) {
+    public function answer($answer): bool
+    {
         $this->answer = $answer;
 
-        return $this;
+        return $this->correct();
     }
 
-    public function correct(){
+    public function correct(): bool
+    {
         return $this->solution === $this->answer;
     }
 

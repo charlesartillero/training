@@ -3,62 +3,55 @@
 namespace App\Test\Quiz;
 
 
+use Exception;
+
 class Quiz
 {
 
-    protected array $questions;
-    protected $questionNumber;
+    protected QuestionCollections $questions;
 
-    public function allQuestions(): array
+
+    function __construct()
+    {
+        $this->questions = new QuestionCollections();
+    }
+
+    public function addQuestion(Question $question): void
+    {
+        $this->questions->add($question);
+    }
+
+    public function questions(): QuestionCollections
     {
         return $this->questions;
     }
 
-    public function addQuestion(Question $question) {
-        $this->questions[] = $question;
+    public function nextQuestion(): Question|bool
+    {
+        return $this->questions->next();
     }
 
-    public function questions() : array {
-        return $this->questions;
-    }
+    /**
+     * @throws Exception
+     */
+    public function grade(): float|int
+    {
 
-    public function firstQuestion() {
-        return $this->questions[0];
-    }
-
-    public function nextQuestion() {
-
-        $this->questionNumber++;
-
-        return $this->questions[$this->questionNumber - 1] ?? false;
-
-    }
-
-    public function grade() {
-
-        if (!$this->isComplete()) {
-            throw new \Exception("All questions should be answer before grading");
+        if (!$this->complete()) {
+            throw new Exception("All questions should be answer before grading");
         }
-
 
         return  $this->countTheCorrectAnswer() / count($this->questions) * 100;
     }
 
-    protected function countTheCorrectAnswer() {
-        return count(array_filter($this->questions, function($question) {
-            return $question->correct();
-        }));
+    public function countTheCorrectAnswer() : int {
+        return count($this->questions->correctAnswer());
     }
 
-    public function isComplete() : bool{
+    public function complete() : bool{
 
-        foreach ($this->questions as $question) {
-            if (!$question->answered()) {
-                return false;
-            }
-        }
+        return $this->questions->count() === count($this->questions->answered());
 
-        return true;
     }
 
 }
