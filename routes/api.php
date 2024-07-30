@@ -28,7 +28,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 
-
+Route::get('testing', function () {
+   return 'Pull Request';
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();
